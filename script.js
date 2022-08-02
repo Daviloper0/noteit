@@ -1,45 +1,44 @@
-//Started at 07/31/2022, 21:04, or better at 21:16;
-const fabButton = document.querySelector('#fab');
-const cards = [];
-let isCreating = false;
-let isEditing = false;
+//Started at 07/31/2022, 21:04, or better at 21:16
+//Refactoring started at 08/02/2022, 11:25;
+const notes = [];
 
-function changeColor(id) {
-    if (isCreating || isEditing) {
-        const background = document.querySelector('.creatorBackground')
-        background.className = 'creatorBackground';
-        background.classList.add(id)
-        background.id = id
-    }
+function createListener(selector, functionName, parameter) {
+    document.querySelector(`${selector}`).addEventListener('click', () => {
+        functionName(parameter);
+    })
 }
+
+function changeBackgroundColor(colorId) {
+    const background = document.querySelector('.creatorBackground')
+    background.className = 'creatorBackground';
+    background.classList.add(colorId);
+    background.id = colorId;
+}
+
 function renderNoNotes() {
-    document.body.classList.remove('creator', 'flex');
-    document.body.classList.add('center');
+    document.body.className = 'center'
     document.body.innerHTML = `
         <p class="informationText">You don't have any notes.<br>Click on the + sign to create one.</p>
         <div class="fab center rounded clickable" id="fab"><p>+</p></div>
-        <script src="script.js"></script>
     `;
-    const fab = document.querySelector("#fab");
-    fab.addEventListener('click', () => {
-        showCreator('creating');
-    })
+    createListener('#fab', showEditor);
 }
-function showCreator(reason, id) {
-    
+
+function showEditor(noteId = -1) {
     document.body.classList.remove('center')
     document.body.classList.add('flex', 'creator');
+
     document.body.innerHTML = `
     <div class="creatorBackground red" id="red">
         <header class="creatorHeader">
             <input type="text" name="creatorTitle" class="creatorTitle white-text" placeholder="Title" id="creatorTitle">
             <div class="flex">
-                <div class="smallBox rounded red clickable" id="red" onclick="changeColor(this.id)"></div>
-                <div class="smallBox rounded blue clickable" id="blue" onclick="changeColor(this.id)"></div>
-                <div class="smallBox rounded green clickable" id="green" onclick="changeColor(this.id)"></div>
-                <div class="smallBox rounded purple clickable" id="purple" onclick="changeColor(this.id)"></div>
-                <div class="smallBox rounded yellow clickable" id="yellow" onclick="changeColor(this.id)"></div>
-                <div class="smallBox rounded darkgrey clickable" id="darkgrey" onclick="changeColor(this.id)"></div>
+                <div class="smallBox rounded red clickable" id="red" onclick="changeBackgroundColor(this.id)"></div>
+                <div class="smallBox rounded blue clickable" id="blue" onclick="changeBackgroundColor(this.id)"></div>
+                <div class="smallBox rounded green clickable" id="green" onclick="changeBackgroundColor(this.id)"></div>
+                <div class="smallBox rounded purple clickable" id="purple" onclick="changeBackgroundColor(this.id)"></div>
+                <div class="smallBox rounded yellow clickable" id="yellow" onclick="changeBackgroundColor(this.id)"></div>
+                <div class="smallBox rounded darkgrey clickable" id="darkgrey" onclick="changeBackgroundColor(this.id)"></div>
             </div>
         </header>
         <textarea name="creatorText" class="creatorText white-text" placeholder="Type the text here..." id="creatorText"></textarea>
@@ -52,98 +51,97 @@ function showCreator(reason, id) {
     </div>
     `;
     
-    if(reason == 'editing') {
-        isEditing = true;
-        isCreating = false;
-
+    if(noteId > -1) {
         document.body.innerHTML += `
         <div class="fab thirdFab center clickable rounded" id="deleteFab">
             <img src="trash.svg" alt="Trash icon">
         </div>`
-        let deleteFab = document.querySelector('#deleteFab');
-        
-        deleteFab.addEventListener('click', () => {
-            cards.splice(id, 1);
-            hideCreator();
-        })
-        
-        document.querySelector('[name="creatorTitle"]').value = cards[id]['title'];
-        document.querySelector('[name="creatorText"]').value = cards[id]['text'];
-        document.querySelector('.creatorBackground').backgroundColor = changeColor(cards[id]['color']);
-    } else {
-        isCreating = true;
+        deleteItemListener(noteId)
+        loadNotesData(noteId);
     }
+    createListener('#homeFab', hideEditor, noteId);
+    createListener('#continueFab', createNote, noteId);
 
-    homeFab = document.querySelector("#homeFab");
-    continueFab = document.querySelector("#continueFab");
-    homeFab.addEventListener('click', () => {
-        isCreating = false;
-        hideCreator(id);
-    })
-    continueFab.addEventListener('click', () => {
-        createNote(id);
+}
+function deleteItemListener(noteId) {
+    let deleteFab = document.querySelector('#deleteFab');
+        
+    deleteFab.addEventListener('click', () => {
+        notes.splice(noteId, 1);
+        hideEditor();
     })
 }
-function hideCreator() {
-    if(cards.length > 0) {
+function loadNotesData(noteId) {
+    document.querySelector('[name="creatorTitle"]').value = notes[noteId]['title'];
+    document.querySelector('[name="creatorText"]').value = notes[noteId]['text'];
+    document.querySelector('.creatorBackground').backgroundColor = changeBackgroundColor(notes[noteId]['color']);
+}
+
+function hideEditor() {
+    if(notes.length > 0) {
         renderNotes();
     } else {
         renderNoNotes();
     }
 }
-function createNote(id) {
-    const color = document.querySelector('.creatorBackground').id;
+
+function getNoteInformation() {
     const noteTitle = document.querySelector('.creatorTitle').value;
     const noteText = document.querySelector('.creatorText').value;
-    const cardInfo = {
-            title: `${noteTitle}`,
-            text: `${noteText}`,
-            color: `${color}`
-            }
-    if (isCreating) {
-        cards.push(cardInfo);
-        isCreating = false;
+    const noteBackgroundColor = document.querySelector('.creatorBackground').id;
+    
+    return [noteTitle, noteText, noteBackgroundColor];
+}
 
-    }else {
-        cards[id] = cardInfo;
+function createNote(noteId) {
+    const noteArray = getNoteInformation();
+
+    const noteInfo = {
+            title: `${noteArray[0]}`,
+            text: `${noteArray[1]}`,
+            color: `${noteArray[2]}`
+            }
+
+    if (noteId < 0) {
+        notes.push(noteInfo);
+    } else {
+        notes[noteId] = noteInfo;
     }
-    hideCreator();
+    
+    hideEditor();
+
+}
+function getNoteData(index) {
+    let color = notes[index].color;
+    let title = notes[index].title;
+    let text = notes[index].text;
+
+    if (notes[index].title.length > 6) {
+        title = title.slice(0, 6) + '...';
+    }
+    if (notes[index].text.length > 69) {
+        text = text.slice(0, 69) + '...';
+    }
+    return [color, title, text];
+    
 }
 function renderNotes() {    
-        document.body.classList.remove('creator');
+    document.body.classList.remove('creator');
 
-        document.body.innerHTML = `
-        <div class="home flex wrap">
-        <div class="fab center rounded clickable" id="fab"><p>+</p></div>
-        <script src="script.js"></script>`
+    document.body.innerHTML = `
+    <div class="home flex wrap">
+    <div class="fab center rounded clickable" id="fab"><p>+</p></div>`
 
-        const parentDiv = document.querySelector(".home");
-        for (let i = 0; i < cards.length; i++) {
-            let color = cards[i].color;
-            let title = cards[i].title;
-            let text = cards[i].text;
-
-            if (cards[i].title.length > 6) {
-                title = title.slice(0, 6) + '...';
-            }
-            if (cards[i].title.length > 69) {
-                text = text.slice(0, 69) + '...';
-            }
-           
-            parentDiv.innerHTML += `
-            <div class="clickable notesCard rounded ${color}" onclick="showCreator('editing', ${i})">
-                <h1 class="notesTitle">${title}</h1>
-                <p class="notesText">${text}</p>
-            </div>`
-            
-        }
-        const fab = document.querySelector('#fab');
-        fab.addEventListener('click', () => {
-            showCreator('creating');
-        })
+    const parentDiv = document.querySelector(".home");
+    for (let i = 0; i < notes.length; i++) {
+        dataArray = getNoteData(i); 
+        parentDiv.innerHTML += `
+        <div class="clickable notesCard rounded ${dataArray[0]}" onclick="showEditor(${i})">
+            <h1 class="notesTitle">${dataArray[1]}</h1>
+            <p class="notesText">${dataArray[2]}</p>
+        </div>`
+        
+    }
+    createListener('#fab', showEditor);
 }
-
-
-fabButton.addEventListener('click', () => {
-    showCreator('creating');
-})
+createListener('#fab', showEditor);
