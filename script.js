@@ -1,6 +1,16 @@
 //Started at 07/31/2022, 21:04, or better at 21:16
 //Refactoring started at 08/02/2022, 11:25;
-const notes = [];
+let notes = [];
+const storage = localStorage;
+
+function loadFromStorage() {
+    if(localStorage.length > 0) {
+        notes = JSON.parse(localStorage.getItem('1'));
+    }
+    if (notes.length > 0) {
+        renderNotes();
+    }
+}
 
 function createListener(selector, functionName, parameter) {
     document.querySelector(`${selector}`).addEventListener('click', () => {
@@ -44,7 +54,7 @@ function showEditor(noteId = -1) {
         <textarea name="creatorText" class="creatorText white-text" placeholder="Type the text here..." id="creatorText"></textarea>
     </div>
     <div class="fab center clickable rounded" id="continueFab">
-        <p>&#x1F862;</p>
+        <img src="arrow.png" alt="Right arrow icon">
     </div>
     <div class="fab secondFab center clickable rounded" id="homeFab">
         <img src="house.svg" alt="House icon">
@@ -63,11 +73,13 @@ function showEditor(noteId = -1) {
     createListener('#continueFab', createNote, noteId);
 
 }
+
 function deleteItemListener(noteId) {
     let deleteFab = document.querySelector('#deleteFab');
         
     deleteFab.addEventListener('click', () => {
         notes.splice(noteId, 1);
+        saveOnStorage();
         hideEditor();
     })
 }
@@ -104,13 +116,30 @@ function createNote(noteId) {
 
     if (noteId < 0) {
         notes.push(noteInfo);
+        saveOnStorage();
     } else {
         notes[noteId] = noteInfo;
+        saveOnStorage();
     }
     
     hideEditor();
 
 }
+function saveOnStorage() {
+    //Salvar o array inteiro parece ser algo mais interessante
+    if (storage.length > 0) {
+        for (let i = 0; i < storage.length; i++) {
+            deleteOfStorage(i);
+        }
+    }
+
+    storage.setItem(storage.length, `${JSON.stringify(notes)}`);
+}
+
+function deleteOfStorage(index) {
+    storage.removeItem(index);
+}
+
 function getNoteData(index) {
     let color = notes[index].color;
     let title = notes[index].title;
@@ -125,9 +154,8 @@ function getNoteData(index) {
     return [color, title, text];
     
 }
-function renderNotes() {    
-    document.body.classList.remove('creator');
-
+function renderNotes() {  
+    document.body.className = 'flex';
     document.body.innerHTML = `
     <div class="home flex wrap">
     <div class="fab center rounded clickable" id="fab"><p>+</p></div>`
@@ -144,4 +172,5 @@ function renderNotes() {
     }
     createListener('#fab', showEditor);
 }
+loadFromStorage();
 createListener('#fab', showEditor);
