@@ -4,12 +4,14 @@ let notes = [];
 const storage = localStorage;
 
 function loadFromStorage() {
-    if(localStorage.length > 0) {
+    if(localStorage.getItem('1').length > 0) {
+        
         notes = JSON.parse(localStorage.getItem('1'));
+        if (!notes == null) {
+            renderNotes();
+        }
     }
-    if (notes.length > 0) {
-        renderNotes();
-    }
+    
 }
 
 function createListener(selector, functionName, parameter) {
