@@ -4,9 +4,12 @@ let notes = [];
 const storage = localStorage;
 
 function loadFromStorage() {
-    if(localStorage.getItem('1') != null) {
-        notes = JSON.parse(localStorage.getItem('1'));
-        renderNotes();
+    if(localStorage.getItem(0) != null) {
+        notes = JSON.parse(localStorage.getItem(0));
+        if(notes != null && notes.length > 0) {
+            renderNotes();
+        }
+        
     }
     
 }
@@ -132,7 +135,7 @@ function saveOnStorage() {
         }
     }
 
-    storage.setItem(storage.length, `${JSON.stringify(notes)}`);
+    storage.setItem(0, `${JSON.stringify(notes)}`);
 }
 
 function deleteOfStorage(index) {
