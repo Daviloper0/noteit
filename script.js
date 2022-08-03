@@ -4,12 +4,9 @@ let notes = [];
 const storage = localStorage;
 
 function loadFromStorage() {
-    if(localStorage.getItem('1').length > 0) {
-        
+    if(localStorage.getItem('1') != null) {
         notes = JSON.parse(localStorage.getItem('1'));
-        if (!notes == null) {
-            renderNotes();
-        }
+        renderNotes();
     }
     
 }
