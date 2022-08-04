@@ -5,7 +5,7 @@ Note it! Is a simple notes program.
 
 With Note it! It's simple to create any notes you might want. 
 
-#updates
+# Updates
 *Update 1.0.0
 Initial Commit. The program has 6 colors to pick for saving the notes. It is possible to edit, delete and to create notes.
 
