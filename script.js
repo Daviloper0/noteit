@@ -3,43 +3,64 @@
 let notes = [];
 const storage = localStorage;
 
-function loadFromStorage() {
-    if(localStorage.getItem(0) != null) {
-        notes = JSON.parse(localStorage.getItem(0));
-        if(notes != null && notes.length > 0) {
-            renderNotes();
-        }
-        
+function isStorageNotNull() {
+
+    if (localStorage.getItem(0) != null) {
+        return true
     }
+    return false
+
+}
+function isThereAnyNotes() {
     
+    notes = JSON.parse(localStorage.getItem(0));
+    if(notes != null && notes.length > 0) {
+        return true;
+    }
+
+}
+
+
+function loadFromStorage() {
+        
+    if(isStorageNotNull() && isThereAnyNotes()) {
+        renderNotes();
+    }
+
 }
 
 function createListener(selector, functionName, parameter) {
+    
     document.querySelector(`${selector}`).addEventListener('click', () => {
         functionName(parameter);
     })
+
 }
 
 function changeBackgroundColor(colorId) {
+    
     const background = document.querySelector('.creatorBackground')
     background.className = 'creatorBackground';
     background.classList.add(colorId);
     background.id = colorId;
+
 }
 
 function renderNoNotes() {
+    
     document.body.className = 'center'
     document.body.innerHTML = `
         <p class="informationText">You don't have any notes.<br>Click on the + sign to create one.</p>
         <div class="fab center rounded clickable" id="fab"><p>+</p></div>
     `;
     createListener('#fab', showEditor);
+
 }
 
 function showEditor(noteId = -1) {
+    
     document.body.classList.remove('center')
     document.body.classList.add('flex', 'creator');
-
     document.body.innerHTML = `
     <div class="creatorBackground red" id="red">
         <header class="creatorHeader">
@@ -77,34 +98,40 @@ function showEditor(noteId = -1) {
 }
 
 function deleteItemListener(noteId) {
-    let deleteFab = document.querySelector('#deleteFab');
-        
+    
+    let deleteFab = document.querySelector('#deleteFab');    
     deleteFab.addEventListener('click', () => {
         notes.splice(noteId, 1);
         saveOnStorage();
         hideEditor();
     })
+
 }
 function loadNotesData(noteId) {
+
     document.querySelector('[name="creatorTitle"]').value = notes[noteId]['title'];
     document.querySelector('[name="creatorText"]').value = notes[noteId]['text'];
     document.querySelector('.creatorBackground').backgroundColor = changeBackgroundColor(notes[noteId]['color']);
+
 }
 
 function hideEditor() {
+    
     if(notes.length > 0) {
         renderNotes();
     } else {
         renderNoNotes();
     }
+
 }
 
 function getNoteInformation() {
+    
     const noteTitle = document.querySelector('.creatorTitle').value;
     const noteText = document.querySelector('.creatorText').value;
     const noteBackgroundColor = document.querySelector('.creatorBackground').id;
-    
     return [noteTitle, noteText, noteBackgroundColor];
+    
 }
 
 function createNote(noteId) {
@@ -118,17 +145,15 @@ function createNote(noteId) {
 
     if (noteId < 0) {
         notes.push(noteInfo);
-        saveOnStorage();
     } else {
         notes[noteId] = noteInfo;
-        saveOnStorage();
     }
-    
+    saveOnStorage();
     hideEditor();
 
 }
 function saveOnStorage() {
-    //Salvar o array inteiro parece ser algo mais interessante
+    //Salvar o array inteiro parece ser algo mais interessante do que outras soluções
     if (storage.length > 0) {
         for (let i = 0; i < storage.length; i++) {
             deleteOfStorage(i);
@@ -153,10 +178,13 @@ function getNoteData(index) {
     if (notes[index].text.length > 69) {
         text = text.slice(0, 69) + '...';
     }
+    
     return [color, title, text];
     
 }
+
 function renderNotes() {  
+
     document.body.className = 'flex';
     document.body.innerHTML = `
     <div class="home flex wrap">
@@ -173,6 +201,7 @@ function renderNotes() {
         
     }
     createListener('#fab', showEditor);
+
 }
 loadFromStorage();
 createListener('#fab', showEditor);
