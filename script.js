@@ -4,22 +4,15 @@ let notes = [];
 const storage = localStorage;
 
 function isStorageNotNull() {
-
-    if (localStorage.getItem(0) != null) {
-        return true
-    }
-    return false
-
+    return localStorage.getItem(0) != null;
 }
+
 function isThereAnyNotes() {
     
     notes = JSON.parse(localStorage.getItem(0));
-    if(notes != null && notes.length > 0) {
-        return true;
-    }
+    return notes != null && notes.length > 0;
 
 }
-
 
 function loadFromStorage() {
         
@@ -172,10 +165,10 @@ function getNoteData(index) {
     let title = notes[index].title;
     let text = notes[index].text;
 
-    if (notes[index].title.length > 6) {
+    if (title.length > 6) {
         title = title.slice(0, 6) + '...';
     }
-    if (notes[index].text.length > 69) {
+    if (text.length > 69) {
         text = text.slice(0, 69) + '...';
     }
     
