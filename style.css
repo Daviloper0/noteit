@@ -254,6 +254,9 @@ body {
 }
 
 @media screen and (max-width: 550px){
+    .informationText {
+        text-align: center;
+    }
     .fab, .secondFab, .thirdFab {
         margin: 16px;
         width: 200px;
